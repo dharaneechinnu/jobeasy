@@ -1,0 +1,30 @@
+# Python
+*.pyc
+__pycache__/
+*.py[cod]
+.env
+.venv/
+venv/
+*.sqlite3
+staticfiles/
+mediafiles/
+*.egg-info/
+dist/
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Node
+node_modules/
+dist/
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.user
