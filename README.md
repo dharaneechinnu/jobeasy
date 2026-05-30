@@ -26,7 +26,7 @@ source .venv/bin/activate
 # Production dependencies
 pip install -r requirements.txt
 
-# Development dependencies (includes test tools, linters, debug toolbar)
+# Development dependencies (test tools, linters)
 pip install -r requirements-dev.txt
 ```
 
@@ -142,24 +142,21 @@ npm run build
 ## Project Structure
 
 ```
-packages/
+jobeasy/
 ├── backend/                  Django + DRF API
-│   ├── config/               Project settings, URLs, WSGI/ASGI
-│   │   └── settings/
-│   │       ├── base.py       Shared settings
-│   │       ├── development.py
-│   │       └── production.py
-│   ├── apps/
-│   │   ├── core/             Abstract base models, pagination
-│   │   └── users/            Custom user model, JWT auth endpoints
-│   └── scripts/start.sh      Production startup script
-└── frontend/                 React + Vite + TypeScript SPA
+│   ├── jobeasy/              Project settings, URLs, WSGI/ASGI
+│   ├── accounts/             Custom user model, JWT auth endpoints
+│   ├── jobs/                 Job search via RapidAPI
+│   ├── agent/                Claude AI agent integration
+│   ├── saved/                Saved jobs per user
+│   ├── manage.py
+│   └── requirements.txt
+└── frontend/                 React + Vite SPA
     └── src/
+        ├── api/              Axios instance + per-feature API modules
         ├── components/       Reusable UI and layout components
-        ├── hooks/            React Query data-fetching hooks
-        ├── lib/              Axios instance with JWT interceptors
-        ├── pages/            Page components (auth, dashboard, profile)
-        └── store/            Zustand auth state (persisted)
+        ├── context/          AuthContext (JWT-backed auth state)
+        └── pages/            Page components (landing, jobs, agent, profile)
 ```
 
 ## API Endpoints
