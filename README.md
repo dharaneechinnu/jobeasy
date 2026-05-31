@@ -146,8 +146,8 @@ jobeasy/
 ├── backend/                  Django + DRF API
 │   ├── jobeasy/              Project settings, URLs, WSGI/ASGI
 │   ├── accounts/             Custom user model, JWT auth endpoints
-│   ├── jobs/                 Job search via RapidAPI
-│   ├── agent/                Claude AI agent integration
+│   ├── jobs/                 Job search (Remotive + Jobicy, free APIs)
+│   ├── agent/                AI job agent (rule-based NLP, no API key)
 │   ├── saved/                Saved jobs per user
 │   ├── manage.py
 │   └── requirements.txt
