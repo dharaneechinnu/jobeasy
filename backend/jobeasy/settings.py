@@ -125,6 +125,4 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000').split(',')
 CORS_ALLOW_CREDENTIALS = True
 
-# API keys
-RAPIDAPI_KEY = os.getenv('RAPIDAPI_KEY', '')
-ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY', '')
+# No external API keys required — job data comes from Remotive and Jobicy (free, no auth)

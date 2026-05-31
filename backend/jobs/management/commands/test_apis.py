@@ -1,81 +1,52 @@
-import json
 import requests
 from django.core.management.base import BaseCommand
-from django.conf import settings
 
 
 class Command(BaseCommand):
-    help = 'Test RapidAPI JSearch and Anthropic Claude API connections'
+    help = 'Test connectivity to Remotive and Jobicy (free job APIs)'
 
     def handle(self, *args, **options):
-        self.stdout.write('\n' + '='*50)
+        self.stdout.write('\n' + '=' * 50)
         self.stdout.write('  JobEasy API Connection Test')
-        self.stdout.write('='*50 + '\n')
+        self.stdout.write('=' * 50 + '\n')
 
-        self._test_rapidapi()
-        self._test_anthropic()
+        self._test_remotive()
+        self._test_jobicy()
 
-        self.stdout.write('\n' + '='*50 + '\n')
+        self.stdout.write('\n' + '=' * 50 + '\n')
 
-    def _test_rapidapi(self):
-        self.stdout.write('\n[1] RapidAPI JSearch')
-
-        key = settings.RAPIDAPI_KEY
-        if not key:
-            self.stdout.write(self.style.ERROR('   RAPIDAPI_KEY not set in .env'))
-            return
-
-        self.stdout.write(f'   Key found: {key[:8]}...')
-        self.stdout.write('   Making test search: "Python developer fresher"...')
-
+    def _test_remotive(self):
+        self.stdout.write('\n[1] Remotive (https://remotive.com/api/remote-jobs)')
         try:
-            response = requests.get(
-                'https://jsearch.p.rapidapi.com/search',
-                headers={
-                    'X-RapidAPI-Key': key,
-                    'X-RapidAPI-Host': 'jsearch.p.rapidapi.com',
-                },
-                params={'query': 'Python developer fresher', 'num_pages': '1', 'page': '1'},
-                timeout=15,
+            resp = requests.get(
+                'https://remotive.com/api/remote-jobs',
+                params={'search': 'python developer', 'limit': 3},
+                timeout=10,
             )
-            response.raise_for_status()
-            data = response.json()
-            jobs = data.get('data', [])
+            resp.raise_for_status()
+            jobs = resp.json().get('jobs', [])
             self.stdout.write(self.style.SUCCESS(f'   SUCCESS — {len(jobs)} jobs returned'))
             if jobs:
-                self.stdout.write(f'   Sample: "{jobs[0].get("job_title")}" at {jobs[0].get("employer_name")}')
-        except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 403:
-                self.stdout.write(self.style.ERROR('   FAILED — Invalid API key (403 Forbidden)'))
-            elif e.response.status_code == 429:
-                self.stdout.write(self.style.WARNING('   RATE LIMITED — Key valid but quota exceeded'))
-            else:
-                self.stdout.write(self.style.ERROR(f'   FAILED — HTTP {e.response.status_code}'))
+                self.stdout.write(f'   Sample: "{jobs[0].get("title")}" at {jobs[0].get("company_name")}')
         except requests.exceptions.Timeout:
             self.stdout.write(self.style.ERROR('   FAILED — Request timed out'))
         except Exception as e:
             self.stdout.write(self.style.ERROR(f'   FAILED — {e}'))
 
-    def _test_anthropic(self):
-        self.stdout.write('\n[2] Anthropic Claude API')
-
-        key = settings.ANTHROPIC_API_KEY
-        if not key:
-            self.stdout.write(self.style.ERROR('   ANTHROPIC_API_KEY not set in .env'))
-            return
-
-        self.stdout.write(f'   Key found: {key[:10]}...')
-        self.stdout.write('   Sending test message to claude-sonnet-4-6...')
-
+    def _test_jobicy(self):
+        self.stdout.write('\n[2] Jobicy (https://jobicy.com/api/v2/remote-jobs)')
         try:
-            import anthropic
-            client = anthropic.Anthropic(api_key=key)
-            msg = client.messages.create(
-                model='claude-sonnet-4-6',
-                max_tokens=64,
-                messages=[{'role': 'user', 'content': 'Reply with just: OK'}],
+            resp = requests.get(
+                'https://jobicy.com/api/v2/remote-jobs',
+                params={'count': 3, 'tag': 'python'},
+                timeout=10,
             )
-            reply = msg.content[0].text.strip()
-            self.stdout.write(self.style.SUCCESS(f'   SUCCESS — Claude replied: "{reply}"'))
+            resp.raise_for_status()
+            jobs = resp.json().get('jobs', [])
+            self.stdout.write(self.style.SUCCESS(f'   SUCCESS — {len(jobs)} jobs returned'))
+            if jobs:
+                self.stdout.write(f'   Sample: "{jobs[0].get("jobTitle")}" at {jobs[0].get("companyName")}')
+        except requests.exceptions.Timeout:
+            self.stdout.write(self.style.ERROR('   FAILED — Request timed out'))
         except Exception as e:
             self.stdout.write(self.style.ERROR(f'   FAILED — {e}'))
